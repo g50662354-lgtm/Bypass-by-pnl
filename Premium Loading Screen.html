@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Loading</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400&family=Space+Mono&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg:         #02020D;
+      --accent:     #38BDF8;
+      --accent-glow: rgba(56, 189, 248, 0.18);
+      --text-hi:    #DCF0FC;
+      --text-mid:   #5A7A90;
+      --text-lo:    #1E2E3A;
+    }
+
+    html, body {
+      width: 100%; height: 100%;
+      background: var(--bg);
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    /* ── ambient depth ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background: radial-gradient(ellipse 60% 50% at 50% 50%,
+        rgba(8, 18, 55, 0.95) 0%, transparent 100%);
+      pointer-events: none;
+    }
+
+    /* ── subtle grid ── */
+    .grid {
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(56,189,248,.018) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(56,189,248,.018) 1px, transparent 1px);
+      background-size: 54px 54px;
+    }
+
+    /* ── corner marks ── */
+    .corner {
+      position: fixed;
+      width: 18px; height: 18px;
+      opacity: 0.25;
+    }
+    .corner::before, .corner::after {
+      content: '';
+      position: absolute;
+      background: var(--accent);
+    }
+    .corner::before { width: 1px; height: 100%; }
+    .corner::after  { width: 100%; height: 1px; }
+    .corner.tl { top: 24px; left: 24px; }
+    .corner.tl::before { top: 0; left: 0; }
+    .corner.tl::after  { top: 0; left: 0; }
+
+    .corner.tr { top: 24px; right: 24px; }
+    .corner.tr::before { top: 0; right: 0; }
+    .corner.tr::after  { top: 0; right: 0; }
+
+    .corner.bl { bottom: 24px; left: 24px; }
+    .corner.bl::before { bottom: 0; left: 0; }
+    .corner.bl::after  { bottom: 0; left: 0; }
+
+    .corner.br { bottom: 24px; right: 24px; }
+    .corner.br::before { bottom: 0; right: 0; }
+    .corner.br::after  { bottom: 0; right: 0; }
+
+    /* ── scene ── */
+    .scene {
+      position: relative; z-index: 1;
+      display: flex; flex-direction: column; align-items: center;
+      gap: 42px;
+    }
+
+    /* ── spinner ── */
+    .spinner-wrap {
+      position: relative;
+      width: 168px; height: 168px;
+    }
+
+    .glow-core {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+      animation: core-pulse 2.8s ease-in-out infinite;
+    }
+    @keyframes core-pulse {
+      0%, 100% { opacity: 0.5; transform: translate(-50%,-50%) scale(0.8); }
+      50%       { opacity: 1;   transform: translate(-50%,-50%) scale(1.4); }
+    }
+
+    .spinner-svg {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+    }
+
+    /* SVG ring animations — transform-box keeps origin at each group's own center */
+    .r-a { animation: cw  4.5s linear infinite; transform-box: fill-box; transform-origin: center; }
+    .r-b { animation: ccw 3.2s linear infinite; transform-box: fill-box; transform-origin: center; }
+    .r-c { animation: cw  6.0s linear infinite; transform-box: fill-box; transform-origin: center; }
+
+    @keyframes cw  { to { transform: rotate( 360deg); } }
+    @keyframes ccw { to { transform: rotate(-360deg); } }
+
+    /* ── text ── */
+    .text-block {
+      display: flex; flex-direction: column; align-items: center; gap: 11px;
+    }
+
+    .eyebrow {
+      font-family: 'Space Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.5em;
+      color: var(--text-mid);
+      text-transform: uppercase;
+    }
+
+    .headline {
+      font-weight: 300;
+      font-size: 15.5px;
+      letter-spacing: 0.1em;
+      color: var(--text-hi);
+      white-space: nowrap;
+    }
+
+    .accent-sep { color: var(--accent); margin: 0 0.5em; }
+
+    /* animated dots */
+    .dots::after {
+      content: '';
+      animation: dot-anim 2.6s steps(4, end) infinite;
+    }
+    @keyframes dot-anim {
+      0%  { content: ''; }
+      25% { content: '.'; }
+      50% { content: '..'; }
+      75% { content: '...'; }
+    }
+
+    /* ── scan bar ── */
+    .scan-wrap {
+      width: 230px;
+      display: flex; flex-direction: column; align-items: center; gap: 9px;
+    }
+
+    .scan-track {
+      width: 100%; height: 1px;
+      background: var(--text-lo);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .scan-beam {
+      position: absolute;
+      top: -1px; left: 0;
+      height: 3px; width: 45%;
+      background: linear-gradient(90deg, transparent 0%, var(--accent) 50%, transparent 100%);
+      border-radius: 2px;
+      box-shadow: 0 0 8px var(--accent), 0 0 20px rgba(56,189,248,0.35);
+      animation: beam-move 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    @keyframes beam-move {
+      0%   { transform: translateX(-100%); opacity: 0; }
+      15%  { opacity: 1; }
+      85%  { opacity: 1; }
+      100% { transform: translateX(320%); opacity: 0; }
+    }
+
+    .scan-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 8px;
+      letter-spacing: 0.4em;
+      color: var(--text-lo);
+      text-transform: uppercase;
+    }
+
+    /* ── reduced motion ── */
+    @media (prefers-reduced-motion: reduce) {
+      .r-a, .r-b, .r-c, .glow-core, .scan-beam, .dots::after { animation: none; }
+      .dots::after { content: '...'; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="grid"></div>
+  <div class="corner tl"></div>
+  <div class="corner tr"></div>
+  <div class="corner bl"></div>
+  <div class="corner br"></div>
+
+  <div class="scene">
+
+    <!-- Spinner -->
+    <div class="spinner-wrap">
+      <div class="glow-core"></div>
+
+      <svg class="spinner-svg" viewBox="0 0 168 168" fill="none" xmlns="http://www.w3.org/2000/svg">
+
+        <!-- Ghost base rings -->
+        <circle cx="84" cy="84" r="76" stroke="rgba(56,189,248,.06)" stroke-width="1"/>
+        <circle cx="84" cy="84" r="58" stroke="rgba(56,189,248,.05)" stroke-width=".5"/>
+        <circle cx="84" cy="84" r="40" stroke="rgba(56,189,248,.06)" stroke-width=".5"/>
+
+        <!-- Outer arc — CW -->
+        <!-- Circumference r=76 ≈ 477.5 -->
+        <g class="r-a">
+          <circle cx="84" cy="84" r="76"
+            stroke="#38BDF8" stroke-width="1.3"
+            stroke-dasharray="100 377"
+            stroke-linecap="round" opacity=".9"/>
+          <circle cx="84" cy="84" r="76"
+            stroke="#38BDF8" stroke-width="1.3"
+            stroke-dasharray="22 455"
+            stroke-dashoffset="-220"
+            stroke-linecap="round" opacity=".35"/>
+        </g>
+
+        <!-- Mid arc — CCW -->
+        <!-- Circumference r=58 ≈ 364.4 -->
+        <g class="r-b">
+          <circle cx="84" cy="84" r="58"
+            stroke="#38BDF8" stroke-width=".8"
+            stroke-dasharray="52 312"
+            stroke-linecap="round" opacity=".6"/>
+        </g>
+
+        <!-- Inner arc — CW -->
+        <!-- Circumference r=40 ≈ 251.3 -->
+        <g class="r-c">
+          <circle cx="84" cy="84" r="40"
+            stroke="#38BDF8" stroke-width="1"
+            stroke-dasharray="32 219"
+            stroke-linecap="round" opacity=".7"/>
+        </g>
+
+        <!-- Center -->
+        <circle cx="84" cy="84" r="2.8" fill="#38BDF8" opacity=".9"/>
+        <circle cx="84" cy="84" r="6"   fill="none" stroke="#38BDF8" stroke-width=".5" opacity=".3"/>
+      </svg>
+    </div>
+
+    <!-- Text -->
+    <div class="text-block">
+      <div class="eyebrow">System</div>
+      <div class="headline">
+        Resource Loading<span class="dots"></span><span class="accent-sep">·</span>Please Wait
+      </div>
+    </div>
+
+    <!-- Scan bar -->
+    <div class="scan-wrap">
+      <div class="scan-track">
+        <div class="scan-beam"></div>
+      </div>
+      <div class="scan-label">Initializing</div>
+    </div>
+
+  </div>
+
+</body>
+</html>
